@@ -171,19 +171,19 @@
         <p class="label">Portfolio</p>
         <h2 class="section-heading">Recent <em>Work</em></h2>
       </div>
-      <a href="#" class="btn-outline">View All Projects &nbsp;→</a>
+      <a href="#" class="btn-outline" onclick="openGallery(0); return false;">View All Projects &nbsp;→</a>
     </div>
 
     <div class="portfolio-grid">
-      <div class="portfolio-item featured">
+      <div class="portfolio-item featured" onclick="openGallery(0)" style="cursor:pointer;">
         <img src="project-house.jpeg" alt="Luxury estate with pool — Scottsdale" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;" />
         <div class="portfolio-caption">Luxury Estate · Scottsdale</div>
       </div>
-      <div class="portfolio-item small">
+      <div class="portfolio-item small" onclick="openGallery(1)" style="cursor:pointer;">
         <img src="kitchen-1.jpeg" alt="Kitchen remodel with white cabinets and marble counters" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;" />
         <div class="portfolio-caption">Kitchen Remodel</div>
       </div>
-      <div class="portfolio-item small">
+      <div class="portfolio-item small" onclick="openGallery(2)" style="cursor:pointer;">
         <img src="kitchen-2.jpeg" alt="Custom white cabinetry with gold hardware" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;" />
         <div class="portfolio-caption">Custom Cabinetry</div>
       </div>
@@ -191,11 +191,11 @@
 
     <!-- Kitchen project full row -->
     <div class="portfolio-grid portfolio-grid--wide" style="margin-top:2px;">
-      <div class="portfolio-item" style="min-height:340px;">
+      <div class="portfolio-item" style="min-height:340px;cursor:pointer;" onclick="openGallery(3)">
         <img src="kitchen-3.jpeg" alt="Open concept kitchen and living space remodel" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;" />
         <div class="portfolio-caption">Open Concept Kitchen & Living · Phoenix</div>
       </div>
-      <div class="portfolio-item" style="min-height:340px;">
+      <div class="portfolio-item" style="min-height:340px;cursor:pointer;" onclick="openGallery(4)">
         <img src="project-bathroom.jpeg" alt="Luxury bathroom remodel with marble tile" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;" />
         <div class="portfolio-caption">Bathroom Remodel · Scottsdale</div>
       </div>
@@ -312,7 +312,7 @@
         <textarea id="message" placeholder="Describe your project, timeline, and budget range…"></textarea>
       </div>
 
-      <button class="form-submit" type="button">Send Message &nbsp;→</button>
+      <button class="form-submit" type="button" onclick="sendEmail()">Send Message &nbsp;→</button>
     </div>
   </section>
 
@@ -322,6 +322,92 @@
     <p>© 2025 Sweet Spot Construction · All Rights Reserved</p>
     <p>ROC #361611 · Licensed · Bonded · Insured · Scottsdale, AZ</p>
   </footer>
+  <!-- ══ LIGHTBOX ══ -->
+  <div id="lightbox" onclick="closeLightbox()" style="display:none;position:fixed;inset:0;z-index:999;background:rgba(0,0,0,0.95);align-items:center;justify-content:center;">
+    <button onclick="prevPhoto(event)" style="position:absolute;left:1.5rem;top:50%;transform:translateY(-50%);background:none;border:1px solid rgba(255,255,255,0.3);color:#fff;font-size:1.5rem;width:48px;height:48px;cursor:pointer;border-radius:50%;">&#8592;</button>
+    <img id="lightbox-img" src="" alt="" style="max-width:90vw;max-height:88vh;object-fit:contain;box-shadow:0 0 60px rgba(0,0,0,0.8);" onclick="event.stopPropagation()" />
+    <div id="lightbox-caption" style="position:absolute;bottom:2rem;left:50%;transform:translateX(-50%);color:rgba(255,255,255,0.6);font-size:11px;letter-spacing:0.2em;text-transform:uppercase;white-space:nowrap;"></div>
+    <button onclick="nextPhoto(event)" style="position:absolute;right:1.5rem;top:50%;transform:translateY(-50%);background:none;border:1px solid rgba(255,255,255,0.3);color:#fff;font-size:1.5rem;width:48px;height:48px;cursor:pointer;border-radius:50%;">&#8594;</button>
+    <button onclick="closeLightbox()" style="position:absolute;top:1.2rem;right:1.5rem;background:none;border:none;color:rgba(255,255,255,0.5);font-size:1.8rem;cursor:pointer;line-height:1;">&#215;</button>
+  </div>
+
+  <script>
+    /* ── Gallery data ── */
+    const gallery = [
+      { src: 'project-house.jpeg',    caption: 'Luxury Estate · Scottsdale' },
+      { src: 'kitchen-1.jpeg',        caption: 'Kitchen Remodel' },
+      { src: 'kitchen-2.jpeg',        caption: 'Custom Cabinetry' },
+      { src: 'kitchen-3.jpeg',        caption: 'Open Concept Kitchen & Living · Phoenix' },
+      { src: 'project-bathroom.jpeg', caption: 'Bathroom Remodel · Scottsdale' },
+    ];
+
+    let current = 0;
+
+    function openGallery(index) {
+      current = index;
+      showPhoto();
+      const lb = document.getElementById('lightbox');
+      lb.style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeLightbox() {
+      document.getElementById('lightbox').style.display = 'none';
+      document.body.style.overflow = '';
+    }
+
+    function showPhoto() {
+      document.getElementById('lightbox-img').src = gallery[current].src;
+      document.getElementById('lightbox-caption').textContent = gallery[current].caption;
+    }
+
+    function prevPhoto(e) {
+      e.stopPropagation();
+      current = (current - 1 + gallery.length) % gallery.length;
+      showPhoto();
+    }
+
+    function nextPhoto(e) {
+      e.stopPropagation();
+      current = (current + 1) % gallery.length;
+      showPhoto();
+    }
+
+    /* keyboard navigation */
+    document.addEventListener('keydown', function(e) {
+      const lb = document.getElementById('lightbox');
+      if (lb.style.display !== 'flex') return;
+      if (e.key === 'ArrowRight') { current = (current + 1) % gallery.length; showPhoto(); }
+      if (e.key === 'ArrowLeft')  { current = (current - 1 + gallery.length) % gallery.length; showPhoto(); }
+      if (e.key === 'Escape') closeLightbox();
+    });
+
+    /* ── Contact form mailto ── */
+    function sendEmail() {
+      const fname   = document.getElementById('fname').value.trim();
+      const lname   = document.getElementById('lname').value.trim();
+      const email   = document.getElementById('email').value.trim();
+      const service = document.getElementById('service').value;
+      const message = document.getElementById('message').value.trim();
+
+      if (!fname || !lname || !email || !service || !message) {
+        alert('Please fill out all fields before sending.');
+        return;
+      }
+
+      const subject = encodeURIComponent(`New Project Inquiry — ${service}`);
+      const body = encodeURIComponent(
+`Name: ${fname} ${lname}
+Email: ${email}
+Project Type: ${service}
+
+Project Details:
+${message}`
+      );
+
+      window.location.href = `mailto:greg@sweetspotconstruction.com?subject=${subject}&body=${body}`;
+    }
+  </script>
 
 </body>
 </html>
